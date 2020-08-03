@@ -1,0 +1,39 @@
+import ij.*;
+import ij.process.*; 
+import ij.measure.*;
+import ij.gui.Overlay;
+
+mm.scripter().clearMessageWindow();
+print("Live processing");
+mm.live().setLiveMode(false);
+mmc.snapImage();
+
+int x = mmc.getImageWidth();
+int y = mmc.getImageHeight();
+
+// create stand-alone image processor
+// ----------------------------------
+ip = new ShortProcessor(x, y,(short[])mmc.getImage(),null);
+
+// display processed image
+// -----------------------
+ImagePlus ipp = new ImagePlus("test",ip);
+ipp.show();
+
+while(true){
+	mmc.snapImage();
+	short[] imgBytes = (short[])mmc.getImage();
+   ShortProcessor bp = new ShortProcessor(x,y,imgBytes,null);
+   bp.invert();
+   bp.add(-600);
+	ipp.setProcessor(bp);
+	ImageStatistics bs = ipp.getAllStatistics();
+	bs.getStatistics(ipp.getProcessor());
+	double dx = bs.xCenterOfMass-x/2;
+	double dy = bs.yCenterOfMass-y/2;
+	//print(dx+","+dy);
+	mmc.sleep(50);
+	mmc.setXYPosition(mmc.getXPosition()+dx,mmc.getYPosition()+dy);
+	mmc.waitForDevice("XYStage");
+	ipp.show();
+	}

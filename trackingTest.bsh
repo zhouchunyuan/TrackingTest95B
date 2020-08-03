@@ -1,0 +1,21 @@
+import java.lang.Math;
+import java.util.*;  
+
+double speed = 25000; //um per sec
+double ms_per_um = 1/speed*1000;
+mm.live().setLiveMode(true);
+//mmc.setXYPosition(0,0);
+while(true){
+
+	double x = Double.parseDouble(mmc.getProperty("MMCam","x position"));
+	double y = Double.parseDouble(mmc.getProperty("MMCam","y position"));
+	double dx = mmc.getXPosition()-x;
+	double dy = mmc.getYPosition()-y;
+	int max = Math.max( Math.abs(dx*ms_per_um),Math.abs(dy*ms_per_um) );
+	int dwell = Math.max(100,max);
+	mmc.sleep(dwell);
+	mmc.waitForDevice("DXYStage");
+	mmc.setXYPosition(dx-mmc.getXPosition(),dy-mmc.getYPosition());
+	//print(x +","+y);
+	//mmc.sleep(100);
+}
